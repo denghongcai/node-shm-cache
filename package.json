@@ -1,0 +1,38 @@
+{
+  "main": "index.js",
+  "scripts": {
+    "configure": "node-gyp configure",
+    "build": "node-gyp build",
+    "test": "mocha",
+    "install": "node-gyp rebuild"
+  },
+  "devDependencies": {
+    "nan": "^2.0.5",
+    "mocha": "^3.2.0",
+    "node-gyp": "^1.0.3"
+  },
+  "dependencies": {
+    "bindings": "^1.2.1"
+  },
+  "gypfile": true,
+  "name": "node-shm-cache",
+  "description": "[![Build Status](https://travis-ci.org/denghongcai/node-shm-cache.svg)](https://travis-ci.org/denghongcai/node-shm-cache)",
+  "version": "1.0.0",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/denghongcai/node-shm-cache.git"
+  },
+  "keywords": [
+    "shm",
+    "cache"
+  ],
+  "author": "Hongcai Deng",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/denghongcai/node-shm-cache/issues"
+  },
+  "homepage": "https://github.com/denghongcai/node-shm-cache#readme"
+}
