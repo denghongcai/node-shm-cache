@@ -22,6 +22,17 @@ var defaultConfig = {
 var ShmCache = function (config) {
   var c = Object.assign({}, defaultConfig);
   Object.assign(c, config);
+  switch (c.type) {
+    case 'shm',
+      c.type = 1;
+      break;
+    case 'mmap':
+      c.type = 2;
+      break;
+    default:
+      c.type = 1;
+      break;
+  }
   var wrapper = new ShmCacheWrapper(c);
   Object.defineProperty(this, 'wrapper', {
     value: wrapper,
