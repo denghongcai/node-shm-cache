@@ -1,4 +1,9 @@
-var ShmCacheWrapper = require('bindings')('NativeExtension').ShmCacheWrapper;
+var binary = require('node-pre-gyp');
+var path = require('path');
+var binding_path = binary.find(path.resolve(path.join(__dirname,'./package.json')));
+var binding = require(binding_path);
+var ShmCacheWrapper = binding.ShmCacheWrapper;
+
 var defaultConfig = {
   type: "shm",
   filename: "/tmp/shmcache",
@@ -23,7 +28,7 @@ var ShmCache = function (config) {
   var c = Object.assign({}, defaultConfig);
   Object.assign(c, config);
   switch (c.type) {
-    case 'shm',
+    case 'shm':
       c.type = 1;
       break;
     case 'mmap':

@@ -2,7 +2,7 @@
 
 // Wrapper Impl
 
-Nan::Persistent<v8::Function> ShmCacheWrapper::constructor;
+Nan::Persistent<v8::FunctionTemplate> ShmCacheWrapper::constructor_template;
 
 NAN_MODULE_INIT(ShmCacheWrapper::Init) {
   v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
@@ -15,7 +15,7 @@ NAN_MODULE_INIT(ShmCacheWrapper::Init) {
   Nan::SetPrototypeMethod(tpl, "Stats", Stats);
   Nan::SetPrototypeMethod(tpl, "Clear", Clear);
 
-  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  constructor_template.Reset(tpl);
   Nan::Set(target, Nan::New("ShmCacheWrapper").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
@@ -71,8 +71,8 @@ NAN_METHOD(ShmCacheWrapper::New) {
   } else {
     const int argc = 1; 
     v8::Local<v8::Value> argv[argc] = {info[0]};
-    v8::Local<v8::Function> cons = Nan::New(constructor);
-    info.GetReturnValue().Set(cons->NewInstance(argc, argv));
+    v8::Local<v8::Function> cons = Nan::New<v8::FunctionTemplate>(constructor_template)->GetFunction();
+    info.GetReturnValue().Set(Nan::NewInstance(cons, argc, argv).ToLocalChecked());
   }
 }
 

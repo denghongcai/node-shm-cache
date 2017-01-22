@@ -1,16 +1,27 @@
 {
     "targets": [
         {
-            "target_name": "NativeExtension",
+            "target_name": "<(module_name)",
             "sources": [ "NativeExtension.cc", "shmcache_wrapper.cc"],
             "include_dirs" : [
  	 			"<!(node -e \"require('nan')\")",
-                "/usr/include/fastcommon",
-                "/usr/include/shmcache"
+                "./deps/libfastcommon/src",
+                "./deps/libshmcache/src"
 			],
             "libraries": [
-                "-lfastcommon",
-                "-lshmcache"
+                "<!(pwd)/deps/libfastcommon/src/libfastcommon.a",
+                "<!(pwd)/deps/libshmcache/src/libshmcache.a"
+            ]
+        },
+        {
+            "target_name": "action_after_build",
+            "type": "none",
+            "dependencies": [ "<(module_name)" ],
+            "copies": [
+                {
+                    "files": [ "<(PRODUCT_DIR)/<(module_name).node" ],
+                    "destination": "<(module_path)"
+                }
             ]
         }
     ],

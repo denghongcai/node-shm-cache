@@ -20,7 +20,8 @@ class ShmCacheWrapper : public Nan::ObjectWrap {
     static NAN_METHOD(Remove);
     static NAN_METHOD(Stats);
     static NAN_METHOD(Clear);
-    static Nan::Persistent<v8::Function> constructor;
+
+    static Nan::Persistent<v8::FunctionTemplate> constructor_template;
     
     struct shmcache_context context;
     struct shmcache_config config;
