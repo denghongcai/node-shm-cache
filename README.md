@@ -1,8 +1,18 @@
 # node-shm-cache
 
-[![Build Status](https://travis-ci.org/denghongcai/node-shm-cache.svg)](https://travis-ci.org/denghongcai/node-shm-cache)
+[![npm version](https://badge.fury.io/js/shm-cache.svg)](https://badge.fury.io/js/shm-cache) [![Build Status](https://travis-ci.org/denghongcai/node-shm-cache.svg)](https://travis-ci.org/denghongcai/node-shm-cache)
 
 A wrapper for libshmcache
+
+## Installation
+
+Just run
+
+```
+$ npm i shm-cache --save
+```
+
+then check `test` folder to get usage :D
 
 ## Building
 
