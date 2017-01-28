@@ -1,9 +1,13 @@
+os:
+  - linux
+  - osx
+
 language: node_js
+
 node_js:
   - "4.6"
   - "6.9"
-env:
-  - CXX=g++-4.8
+
 addons:
   apt:
     sources:
@@ -12,6 +16,8 @@ addons:
       - g++-4.8
 
 before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo sysctl -w kern.sysv.shmall=65536   ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo sysctl -w kern.sysv.shmmax=16777216; fi
   # get commit message
   - COMMIT_MESSAGE=$(git show -s --format=%B $TRAVIS_COMMIT | tr -d '\n')
   # put local node-pre-gyp on PATH
@@ -28,6 +34,7 @@ before_install:
   - if test "${COMMIT_MESSAGE#*'[publish binary]'}" != "$COMMIT_MESSAGE"; then PUBLISH_BINARY=true; fi;
   
 install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CXX=g++-4.8   ; fi
   # ensure source install works
   - npm install --build-from-source
   - npm test

@@ -11,6 +11,9 @@
             "libraries": [
                 "<!(pwd)/deps/libfastcommon/src/libfastcommon.a",
                 "<!(pwd)/deps/libshmcache/src/libshmcache.a"
+            ],
+            "defines": [
+                "__STDC_FORMAT_MACROS"
             ]
         },
         {
