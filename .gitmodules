@@ -4,3 +4,6 @@
 [submodule "deps/libfastcommon"]
 	path = deps/libfastcommon
 	url = https://github.com/denghongcai/libfastcommon
+[submodule "deps/libbson"]
+	path = deps/libbson
+	url = https://github.com/mongodb/libbson.git

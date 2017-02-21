@@ -51,9 +51,6 @@ ShmCache.prototype.set = function (key, value, ttl) {
   if (typeof key !== 'string') {
     throw new Error('key must be string');
   }
-  if (typeof value !== 'string') {
-    throw new Error('value must be string');
-  }
   var parsedTTL = parseInt(ttl, 10);
   if (isNaN(parsedTTL) || parsedTTL <= 0) {
     throw new Error('ttl must be number and greater than zero');

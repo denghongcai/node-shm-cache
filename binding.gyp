@@ -2,15 +2,17 @@
     "targets": [
         {
             "target_name": "<(module_name)",
-            "sources": [ "NativeExtension.cc", "shmcache_wrapper.cc"],
+            "sources": [ "NativeExtension.cc", "shmcache_wrapper.cc", "bson_wrapper.cc"],
             "include_dirs" : [
  	 			"<!(node -e \"require('nan')\")",
                 "./deps/libfastcommon/src",
-                "./deps/libshmcache/src"
+                "./deps/libshmcache/src",
+                "./deps/libbson/dists/include/libbson-1.0"
 			],
             "libraries": [
                 "<!(pwd)/deps/libfastcommon/src/libfastcommon.a",
-                "<!(pwd)/deps/libshmcache/src/libshmcache.a"
+                "<!(pwd)/deps/libshmcache/src/libshmcache.a",
+                "<!(pwd)/deps/libbson/dists/lib/libbson-1.0.a"
             ],
             "defines": [
                 "__STDC_FORMAT_MACROS"

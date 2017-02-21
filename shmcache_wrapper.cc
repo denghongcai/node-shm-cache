@@ -1,4 +1,5 @@
 #include "shmcache_wrapper.h"
+#include "bson_wrapper.h"
 
 // Wrapper Impl
 
@@ -86,8 +87,10 @@ NAN_METHOD(ShmCacheWrapper::Get) {
   key.length = keyString.length();
 
   int result = shmcache_get(&obj->context, &key, &value);
+
   if (result == 0) {
-      info.GetReturnValue().Set(Nan::New<v8::String>(value.data, value.length).ToLocalChecked());
+      BSONWrapper bsonWrapper(value.data, value.length);
+      info.GetReturnValue().Set(bsonWrapper.getValue());
   } else {
       info.GetReturnValue().Set(Nan::Undefined());
   }
@@ -97,13 +100,15 @@ NAN_METHOD(ShmCacheWrapper::Set) {
   ShmCacheWrapper* obj = Nan::ObjectWrap::Unwrap<ShmCacheWrapper>(info.This());
   struct shmcache_key_info key;
   v8::String::Utf8Value keyString(Nan::To<v8::String>(info[0]).ToLocalChecked());
-  v8::String::Utf8Value valueString(Nan::To<v8::String>(info[1]).ToLocalChecked());
+  //v8::String::Utf8Value valueString(Nan::To<v8::String>(info[1]).ToLocalChecked());
   int ttl = info[2]->Int32Value();
 
   key.data = *keyString;
   key.length = keyString.length();
 
-  int result = shmcache_set(&obj->context, &key, *valueString, valueString.length(), ttl);
+  BSONWrapper bsonWrapper(info[1]);
+
+  int result = shmcache_set(&obj->context, &key, bsonWrapper.getBuffer(), bsonWrapper.getBufferLen(), ttl);
   if (result == 0) {
       info.GetReturnValue().Set(Nan::True());
   } else {

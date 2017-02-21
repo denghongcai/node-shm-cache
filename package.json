@@ -5,10 +5,11 @@
     "build": "node-pre-gyp build",
     "clean": "node-pre-gyp clean",
     "test": "mocha",
-    "preinstall": "npm run build:fastcommon && npm run build:shmcache",
+    "preinstall": "npm run build:fastcommon && npm run build:shmcache && npm run build:libbson",
     "install": "node-pre-gyp install --fallback-to-build",
     "build:fastcommon": "cd deps/libfastcommon && MACOSX_DEPLOYMENT_TARGET=10.7 ./make.sh",
-    "build:shmcache": "cd deps/libshmcache/src && MACOSX_DEPLOYMENT_TARGET=10.7 LIBRARY_PATH=../../libfastcommon/src INC_PATH=\" -I../../libfastcommon/src\" make -e"
+    "build:shmcache": "cd deps/libshmcache/src && MACOSX_DEPLOYMENT_TARGET=10.7 LIBRARY_PATH=../../libfastcommon/src INC_PATH=\" -I../../libfastcommon/src\" make -e",
+    "build:libbson": "cd deps/ && MACOSX_DEPLOYMENT_TARGET=10.7 ./build-libbson.sh"
   },
   "binary": {
     "module_name": "NativeExtension",
@@ -29,7 +30,7 @@
   "gypfile": true,
   "name": "shm-cache",
   "description": "[![Build Status](https://travis-ci.org/denghongcai/node-shm-cache.svg)](https://travis-ci.org/denghongcai/node-shm-cache)",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "directories": {
     "test": "test"
   },
