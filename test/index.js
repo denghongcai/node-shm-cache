@@ -1,18 +1,20 @@
 var ShmCache =  require('../');
 var assert = require('assert');
-var obj = new ShmCache({});
+var obj = new ShmCache({type: 'mmap'});
 
 describe('ShmCache', function() {
   it('should set ok', function() {
     obj.set("test", "test", 60);
     obj.set("object", {a: {b:1}, b: 1, c: 'string'}, 60);
     obj.set("array", [{a:1}, 1, 'string'], 60);
+    obj.set("buffer", new Buffer('hello'), 60);
   });
 
   it('should get ok', function() {
     assert.equal(obj.get("test"), "test");
     assert.deepEqual(obj.get("object"), {a: {b:1}, b: 1, c: 'string'});
     assert.deepEqual(obj.get("array"), [{a:1}, 1, 'string']);
+    assert.deepEqual(obj.get("buffer"), new Buffer('hello'));
   });
 
   it('should remove ok', function() {
@@ -21,7 +23,7 @@ describe('ShmCache', function() {
   });
 
   it('should stats ok', function() {
-    assert.equal(obj.stats().hashTable.currentKeyCount, 2);
+    assert.equal(obj.stats().hashTable.currentKeyCount, 3);
   });
 
   it('should clear ok', function() {

@@ -15,6 +15,9 @@ int bson_append_from_v8_primitive(bson_t *b, v8::Local<v8::Value> src, const cha
         return bson_append_utf8(b, key, keyLen,
                 *valueString, valueString.length());
     }
+    if (node::Buffer::HasInstance(src)) {
+        return bson_append_binary(b, key, keyLen, BSON_SUBTYPE_BINARY, (uint8_t*)node::Buffer::Data(src), node::Buffer::Length(src));
+    }
 
     return -1;
 }
@@ -29,6 +32,8 @@ v8::Local<v8::Value> v8_value_from_bson_value(const bson_value_t* v) {
             return Nan::New<v8::Boolean>(v->value.v_bool);
         case BSON_TYPE_UTF8:
             return Nan::New<v8::String>(v->value.v_utf8.str, v->value.v_utf8.len).ToLocalChecked();
+        case BSON_SUBTYPE_BINARY:
+            return Nan::CopyBuffer((const char*)v->value.v_binary.data, v->value.v_binary.data_len).ToLocalChecked();
         default:
             return Nan::Undefined();
     }
