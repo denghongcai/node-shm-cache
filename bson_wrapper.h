@@ -19,7 +19,7 @@ class BSONWrapper {
     v8::Local<v8::Value> getValue();
 
   private:
-    bson_t b;
+    bson_t *b;
 };
 
 #endif

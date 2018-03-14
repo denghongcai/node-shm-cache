@@ -39,15 +39,15 @@ v8::Local<v8::Value> v8_value_from_bson_value(const bson_value_t* v) {
     }
 }
 
-bson_t bson_new_from_v8_value(v8::Local<v8::Value> src, const char* key = NULL, int keyLen = 0, bson_t* parent = NULL) {
-    bson_t b;
+bson_t* bson_new_from_v8_value(v8::Local<v8::Value> src, const char* key = NULL, int keyLen = 0, bson_t* parent = NULL) {
+    bson_t* b;
     if (parent == NULL) {
-        bson_init(&b);
+        b = bson_new();
         if (!src->IsObject() || src->IsNull()) {
-            bson_append_from_v8_primitive(&b, src, SHM_INTERNAL_KEY, SHM_INTERNAL_KEY_LEN);
+            bson_append_from_v8_primitive(b, src, SHM_INTERNAL_KEY, SHM_INTERNAL_KEY_LEN);
             return b;
         }
-        parent = &b;
+        parent = b;
     }
 
     bson_t child;
@@ -76,7 +76,7 @@ bson_t bson_new_from_v8_value(v8::Local<v8::Value> src, const char* key = NULL, 
     } else {
         bson_append_document_end(parent, &child);
     }
-    return *parent;
+    return parent;
 }
 
 v8::Local<v8::Value> v8_value_from_bson_iter(bson_iter_t* iter, v8::Local<v8::Value> t) {
@@ -133,21 +133,21 @@ BSONWrapper::BSONWrapper(v8::Local<v8::Value> src) {
 
 BSONWrapper::BSONWrapper(const char* data, int length) {
     const uint8_t* udata = reinterpret_cast<const uint8_t*>(data);
-    bson_init_static(&b, udata, length);
+    b = bson_new_from_data(udata, length);
 }
 
 const char* BSONWrapper::getBuffer() {
-    return reinterpret_cast<const char*>(bson_get_data(&b));
+    return reinterpret_cast<const char*>(bson_get_data(b));
 }
 
 int BSONWrapper::getBufferLen() {
-    return b.len;
+    return b->len;
 }
 
 v8::Local<v8::Value> BSONWrapper::getValue() {
-    return v8_value_from_bson(&b);
+    return v8_value_from_bson(b);
 }
 
 BSONWrapper::~BSONWrapper() {
-    bson_destroy(&b);
+    bson_destroy(b);
 }
