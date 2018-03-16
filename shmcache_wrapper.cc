@@ -144,7 +144,7 @@ NAN_METHOD(ShmCacheWrapper::Stats) {
 
   retObj->Set(Nan::New<v8::String>("memory").ToLocalChecked(), memObj);
   retObj->Set(Nan::New<v8::String>("hashTable").ToLocalChecked(), tableObj);
-  retObj->Set(Nan::New<v8::String>("lock").ToLocalChecked(), tableObj);
+  retObj->Set(Nan::New<v8::String>("lock").ToLocalChecked(), lockObj);
 
   memObj->Set(Nan::New<v8::String>("total").ToLocalChecked(),
           Nan::New<v8::Number>(stats.memory.max));
