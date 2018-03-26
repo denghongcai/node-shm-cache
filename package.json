@@ -12,7 +12,7 @@
     "trim": "cd deps/ && rm -rf libbson/.git && rm -rf libshmcache/.git && rm -rf libfastcommon/.git && rm libbson/.gitignore && rm libbson/README && cp libbson/README.rst libbson/README"
   },
   "binary": {
-    "module_name": "NativeExtension",
+    "module_name": "shm-cache",
     "module_path": "./binding",
     "host": "https://github.com/denghongcai/node-shm-cache/releases/download/",
     "remote_path": "{version}"
