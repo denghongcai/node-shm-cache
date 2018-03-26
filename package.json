@@ -30,7 +30,7 @@
   "gypfile": true,
   "name": "shm-cache",
   "description": "[![Build Status](https://travis-ci.org/denghongcai/node-shm-cache.svg)](https://travis-ci.org/denghongcai/node-shm-cache)",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "directories": {
     "test": "test"
   },
