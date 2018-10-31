@@ -14,7 +14,7 @@
   "binary": {
     "module_name": "shm-cache",
     "module_path": "./binding",
-    "host": "https://github.com/denghongcai/node-shm-cache/releases/download/",
+    "host": "https://api.github.com/denghongcai/node-shm-cache/releases/download/",
     "remote_path": "{version}"
   },
   "devDependencies": {
@@ -30,7 +30,7 @@
   "gypfile": true,
   "name": "shm-cache",
   "description": "[![Build Status](https://travis-ci.org/denghongcai/node-shm-cache.svg)](https://travis-ci.org/denghongcai/node-shm-cache)",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "directories": {
     "test": "test"
   },
