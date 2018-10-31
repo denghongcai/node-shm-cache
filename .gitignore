@@ -3,3 +3,4 @@ build/
 .ycm_extra_conf.pyc
 binding/
 *.log
+.vscode
