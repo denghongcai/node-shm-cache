@@ -40,6 +40,8 @@ NAN_METHOD(ShmCacheWrapper::New) {
             Nan::New<v8::String>("lockPolicy").ToLocalChecked()).ToLocalChecked()).ToLocalChecked();
     struct shmcache_config config;
 
+    memset(config.filename, 0, sizeof(config.filename));
+
     v8::String::Utf8Value filenameString(cfgObj->Get(Nan::New<v8::String>("filename").ToLocalChecked()));
 
     strncpy(config.filename, *filenameString, filenameString.length());
