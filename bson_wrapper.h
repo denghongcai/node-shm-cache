@@ -10,7 +10,7 @@
 
 class BSONWrapper {
   public:
-    BSONWrapper(v8::Local<v8::Value>);
+    BSONWrapper(v8::Local<v8::Value>, v8::Isolate* isolate);
     BSONWrapper(const char*, int);
     ~BSONWrapper();
 

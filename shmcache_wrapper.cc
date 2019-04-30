@@ -32,6 +32,8 @@ ShmCacheWrapper::~ShmCacheWrapper() {
 }
 
 NAN_METHOD(ShmCacheWrapper::New) {
+  v8::Isolate* isolate = info.GetIsolate();
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
   if (info.IsConstructCall()) {
     v8::Local<v8::Object> cfgObj = Nan::To<v8::Object>(info[0]).ToLocalChecked();
     v8::Local<v8::Object> vaObj = Nan::To<v8::Object>(Nan::Get(cfgObj, 
@@ -39,32 +41,32 @@ NAN_METHOD(ShmCacheWrapper::New) {
     v8::Local<v8::Object> lockObj = Nan::To<v8::Object>(Nan::Get(cfgObj, 
             Nan::New<v8::String>("lockPolicy").ToLocalChecked()).ToLocalChecked()).ToLocalChecked();
     struct shmcache_config config;
-
+    
     memset(config.filename, 0, sizeof(config.filename));
-
-    v8::String::Utf8Value filenameString(cfgObj->Get(Nan::New<v8::String>("filename").ToLocalChecked()));
-
+    
+    v8::String::Utf8Value filenameString(isolate, cfgObj->Get(context, Nan::New<v8::String>("filename").ToLocalChecked()).ToLocalChecked());
+    
     strncpy(config.filename, *filenameString, filenameString.length());
-    config.max_memory = cfgObj->Get(Nan::New<v8::String>("maxMemory").ToLocalChecked())->Int32Value();
-    config.segment_size = cfgObj->Get(Nan::New<v8::String>("segmentSize").ToLocalChecked())->Int32Value();
-    config.max_key_count = cfgObj->Get(Nan::New<v8::String>("maxKeyCount").ToLocalChecked())->Int32Value();
-    config.max_value_size = cfgObj->Get(Nan::New<v8::String>("maxValueSize").ToLocalChecked())->Int32Value();
-    config.type = cfgObj->Get(Nan::New<v8::String>("type").ToLocalChecked())->Int32Value();
+    config.max_memory = cfgObj->Get(context, Nan::New<v8::String>("maxMemory").ToLocalChecked()).ToLocalChecked()->IntegerValue(context).FromJust();
+    config.segment_size = cfgObj->Get(context, Nan::New<v8::String>("segmentSize").ToLocalChecked()).ToLocalChecked()->IntegerValue(context).FromJust();
+    config.max_key_count = cfgObj->Get(context, Nan::New<v8::String>("maxKeyCount").ToLocalChecked()).ToLocalChecked()->IntegerValue(context).FromJust();
+    config.max_value_size = cfgObj->Get(context, Nan::New<v8::String>("maxValueSize").ToLocalChecked()).ToLocalChecked()->IntegerValue(context).FromJust();
+    config.type = cfgObj->Get(context, Nan::New<v8::String>("type").ToLocalChecked()).ToLocalChecked()->IntegerValue(context).FromJust();
     config.recycle_key_once = cfgObj
-        ->Get(Nan::New<v8::String>("recycleKeyOnce").ToLocalChecked())->Int32Value();
+        ->Get(context, Nan::New<v8::String>("recycleKeyOnce").ToLocalChecked()).ToLocalChecked()->IntegerValue(context).FromJust();
 
-    config.va_policy.avg_key_ttl = vaObj->Get(Nan::New<v8::String>("avgKeyTTL").ToLocalChecked())->Int32Value();
-    config.va_policy.discard_memory_size = vaObj->Get(
-            Nan::New<v8::String>("discardMemorySize").ToLocalChecked())->Int32Value();
-    config.va_policy.max_fail_times = vaObj->Get(
-            Nan::New<v8::String>("maxFailTimes").ToLocalChecked())->Int32Value();
-    config.va_policy.sleep_us_when_recycle_valid_entries = vaObj->Get(
-            Nan::New<v8::String>("seelpUsWhenRecycleValidEntries").ToLocalChecked())->Int32Value();
+    config.va_policy.avg_key_ttl = vaObj->Get(context, Nan::New<v8::String>("avgKeyTTL").ToLocalChecked()).ToLocalChecked()->IntegerValue(context).FromJust();
+    config.va_policy.discard_memory_size = vaObj->Get(context, 
+            Nan::New<v8::String>("discardMemorySize").ToLocalChecked()).ToLocalChecked()->IntegerValue(context).FromJust();
+    config.va_policy.max_fail_times = vaObj->Get(context, 
+            Nan::New<v8::String>("maxFailTimes").ToLocalChecked()).ToLocalChecked()->IntegerValue(context).FromJust();
+    config.va_policy.sleep_us_when_recycle_valid_entries = vaObj->Get(context, 
+            Nan::New<v8::String>("seelpUsWhenRecycleValidEntries").ToLocalChecked()).ToLocalChecked()->IntegerValue(context).FromJust();
 
-    config.lock_policy.trylock_interval_us = lockObj->Get(
-            Nan::New<v8::String>("tryLockIntervalUs").ToLocalChecked())->Int32Value();
-    config.lock_policy.detect_deadlock_interval_ms = lockObj->Get(
-            Nan::New<v8::String>("detect_deadlock_interval_ms").ToLocalChecked())->Int32Value();
+    config.lock_policy.trylock_interval_us = lockObj->Get(context, 
+            Nan::New<v8::String>("tryLockIntervalUs").ToLocalChecked()).ToLocalChecked()->IntegerValue(context).FromJust();
+    config.lock_policy.detect_deadlock_interval_ms = lockObj->Get(context, 
+            Nan::New<v8::String>("detect_deadlock_interval_ms").ToLocalChecked()).ToLocalChecked()->IntegerValue(context).FromJust();
 
     config.hash_func = simple_hash;
 
@@ -74,16 +76,17 @@ NAN_METHOD(ShmCacheWrapper::New) {
   } else {
     const int argc = 1; 
     v8::Local<v8::Value> argv[argc] = {info[0]};
-    v8::Local<v8::Function> cons = Nan::New<v8::FunctionTemplate>(constructor_template)->GetFunction();
+    v8::Local<v8::Function> cons = Nan::New<v8::FunctionTemplate>(constructor_template)->GetFunction(context).ToLocalChecked();
     info.GetReturnValue().Set(Nan::NewInstance(cons, argc, argv).ToLocalChecked());
   }
 }
 
 NAN_METHOD(ShmCacheWrapper::Get) {
+  v8::Isolate* isolate = info.GetIsolate();
   ShmCacheWrapper* obj = Nan::ObjectWrap::Unwrap<ShmCacheWrapper>(info.This());
   struct shmcache_key_info key;
   struct shmcache_value_info value;
-  v8::String::Utf8Value keyString(Nan::To<v8::String>(info[0]).ToLocalChecked());
+  v8::String::Utf8Value keyString(isolate, Nan::To<v8::String>(info[0]).ToLocalChecked());
 
   key.data = *keyString;
   key.length = keyString.length();
@@ -99,16 +102,19 @@ NAN_METHOD(ShmCacheWrapper::Get) {
 }
 
 NAN_METHOD(ShmCacheWrapper::Set) {
+  v8::Isolate* isolate = info.GetIsolate();
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
   ShmCacheWrapper* obj = Nan::ObjectWrap::Unwrap<ShmCacheWrapper>(info.This());
   struct shmcache_key_info key;
-  v8::String::Utf8Value keyString(Nan::To<v8::String>(info[0]).ToLocalChecked());
+  v8::String::Utf8Value keyString(isolate, Nan::To<v8::String>(info[0]).ToLocalChecked());
   //v8::String::Utf8Value valueString(Nan::To<v8::String>(info[1]).ToLocalChecked());
-  int ttl = info[2]->Int32Value();
+  int ttl = info[2]->Int32Value(context).FromJust();
 
   key.data = *keyString;
   key.length = keyString.length();
 
-  BSONWrapper bsonWrapper(info[1]);
+  BSONWrapper bsonWrapper(info[1], isolate);
 
   int result = shmcache_set(&obj->context, &key, bsonWrapper.getBuffer(), bsonWrapper.getBufferLen(), ttl);
   if (result == 0) {
@@ -119,9 +125,11 @@ NAN_METHOD(ShmCacheWrapper::Set) {
 }
 
 NAN_METHOD(ShmCacheWrapper::Remove) {
+  v8::Isolate* isolate = info.GetIsolate();
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
   ShmCacheWrapper* obj = Nan::ObjectWrap::Unwrap<ShmCacheWrapper>(info.This());
   struct shmcache_key_info key;
-  v8::String::Utf8Value keyString(Nan::To<v8::String>(info[0]).ToLocalChecked());
+  v8::String::Utf8Value keyString(isolate, Nan::To<v8::String>(info[0]).ToLocalChecked());
 
   key.data = *keyString;
   key.length = keyString.length();

@@ -1,6 +1,6 @@
 #include "bson_wrapper.h"
 
-int bson_append_from_v8_primitive(bson_t *b, v8::Local<v8::Value> src, const char* key, const int keyLen) {
+int bson_append_from_v8_primitive(bson_t *b, v8::Isolate* isolate, v8::Local<v8::Value> src, const char* key, const int keyLen) {
     if (src->IsNumber()) {
         return bson_append_double(b, key, keyLen, Nan::To<double>(src).FromJust());
     }
@@ -11,7 +11,7 @@ int bson_append_from_v8_primitive(bson_t *b, v8::Local<v8::Value> src, const cha
         return bson_append_null(b, key, keyLen);
     }
     if (src->IsString()) {
-        v8::String::Utf8Value valueString(Nan::To<v8::String>(src).ToLocalChecked());
+        v8::String::Utf8Value valueString(isolate, Nan::To<v8::String>(src).ToLocalChecked());
         return bson_append_utf8(b, key, keyLen,
                 *valueString, valueString.length());
     }
@@ -39,12 +39,12 @@ v8::Local<v8::Value> v8_value_from_bson_value(const bson_value_t* v) {
     }
 }
 
-bson_t* bson_new_from_v8_value(v8::Local<v8::Value> src, const char* key = NULL, int keyLen = 0, bson_t* parent = NULL) {
+bson_t* bson_new_from_v8_value(v8::Isolate* isolate, v8::Local<v8::Value> src, const char* key = NULL, int keyLen = 0, bson_t* parent = NULL) {
     bson_t* b;
     if (parent == NULL) {
         b = bson_new();
         if (!src->IsObject() || src->IsNull()) {
-            bson_append_from_v8_primitive(b, src, SHM_INTERNAL_KEY, SHM_INTERNAL_KEY_LEN);
+            bson_append_from_v8_primitive(b, isolate, src, SHM_INTERNAL_KEY, SHM_INTERNAL_KEY_LEN);
             return b;
         }
         parent = b;
@@ -63,12 +63,12 @@ bson_t* bson_new_from_v8_value(v8::Local<v8::Value> src, const char* key = NULL,
     uint32_t length = keys->Length();
     for(uint32_t i = 0; i < length; i++) {
         v8::Local<v8::Value> key = Nan::Get(keys, i).ToLocalChecked();
-        v8::String::Utf8Value keyString(Nan::To<v8::String>(key).ToLocalChecked());
+        v8::String::Utf8Value keyString(isolate, Nan::To<v8::String>(key).ToLocalChecked());
         v8::Local<v8::Value> value = Nan::Get(obj, key).ToLocalChecked();
         if (!value->IsObject() || value->IsNull() || node::Buffer::HasInstance(value)) {
-            bson_append_from_v8_primitive(&child, value, *keyString, keyString.length());
+            bson_append_from_v8_primitive(&child, isolate, value, *keyString, keyString.length());
         } else if (value->IsObject()) {
-            bson_new_from_v8_value(value, *keyString, keyString.length(), &child);
+            bson_new_from_v8_value(isolate, value, *keyString, keyString.length(), &child);
         } 
     }
     if (src->IsArray()) {
@@ -127,8 +127,8 @@ v8::Local<v8::Value> v8_value_from_bson(bson_t* b) {
     return Nan::Undefined();
 }
 
-BSONWrapper::BSONWrapper(v8::Local<v8::Value> src) {
-    b = bson_new_from_v8_value(src, NULL, 0, NULL);
+BSONWrapper::BSONWrapper(v8::Local<v8::Value> src, v8::Isolate* isolate) {
+    b = bson_new_from_v8_value(isolate, src, NULL, 0, NULL);
 }
 
 BSONWrapper::BSONWrapper(const char* data, int length) {
