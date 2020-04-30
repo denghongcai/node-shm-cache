@@ -153,30 +153,30 @@ NAN_METHOD(ShmCacheWrapper::Stats) {
   v8::Local<v8::Object> tableObj = Nan::New<v8::Object>();
   v8::Local<v8::Object> lockObj = Nan::New<v8::Object>();
 
-  retObj->Set(context, Nan::New<v8::String>("memory").ToLocalChecked(), memObj);
-  retObj->Set(context, Nan::New<v8::String>("hashTable").ToLocalChecked(), tableObj);
-  retObj->Set(context, Nan::New<v8::String>("lock").ToLocalChecked(), lockObj);
+  retObj->Set(context, Nan::New<v8::String>("memory").ToLocalChecked(), memObj).FromJust();
+  retObj->Set(context, Nan::New<v8::String>("hashTable").ToLocalChecked(), tableObj).FromJust();
+  retObj->Set(context, Nan::New<v8::String>("lock").ToLocalChecked(), lockObj).FromJust();
 
   memObj->Set(context, Nan::New<v8::String>("total").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.memory.max));
+          Nan::New<v8::Number>(stats.memory.max)).FromJust();
   memObj->Set(context, Nan::New<v8::String>("allocated").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.memory.usage.alloced));
+          Nan::New<v8::Number>(stats.memory.usage.alloced)).FromJust();
   memObj->Set(context, Nan::New<v8::String>("used").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.memory.used));
+          Nan::New<v8::Number>(stats.memory.used)).FromJust();
 
   tableObj->Set(context, Nan::New<v8::String>("maxKeyCount").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.max_key_count));
+          Nan::New<v8::Number>(stats.max_key_count)).FromJust();
   tableObj->Set(context, Nan::New<v8::String>("currentKeyCount").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.hashtable.count));
+          Nan::New<v8::Number>(stats.hashtable.count)).FromJust();
 
   lockObj->Set(context, Nan::New<v8::String>("totalCount").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.shm.lock.total));
+          Nan::New<v8::Number>(stats.shm.lock.total)).FromJust();
   lockObj->Set(context, Nan::New<v8::String>("retryCount").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.shm.lock.retry));
+          Nan::New<v8::Number>(stats.shm.lock.retry)).FromJust();
   lockObj->Set(context, Nan::New<v8::String>("detectDeadLockCount").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.shm.lock.detect_deadlock));
+          Nan::New<v8::Number>(stats.shm.lock.detect_deadlock)).FromJust();
   lockObj->Set(context, Nan::New<v8::String>("unlockDeadLockCount").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.shm.lock.unlock_deadlock));
+          Nan::New<v8::Number>(stats.shm.lock.unlock_deadlock)).FromJust();
 
   info.GetReturnValue().Set(retObj);
 }
