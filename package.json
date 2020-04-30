@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "bindings": "^1.5.0",
-    "nan": "^2.13.2",
+    "nan": "^2.14.1",
     "node-gyp": "^3.8.0",
     "node-pre-gyp": "^0.6.39"
   },
@@ -49,6 +49,6 @@
   },
   "homepage": "https://github.com/denghongcai/node-shm-cache#readme",
   "engines": {
-    "node" : ">=8"
+    "node": ">=8"
   }
 }
