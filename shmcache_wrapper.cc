@@ -126,7 +126,6 @@ NAN_METHOD(ShmCacheWrapper::Set) {
 
 NAN_METHOD(ShmCacheWrapper::Remove) {
   v8::Isolate* isolate = info.GetIsolate();
-  v8::Local<v8::Context> context = isolate->GetCurrentContext();
   ShmCacheWrapper* obj = Nan::ObjectWrap::Unwrap<ShmCacheWrapper>(info.This());
   struct shmcache_key_info key;
   v8::String::Utf8Value keyString(isolate, Nan::To<v8::String>(info[0]).ToLocalChecked());
@@ -144,6 +143,8 @@ NAN_METHOD(ShmCacheWrapper::Remove) {
 
 NAN_METHOD(ShmCacheWrapper::Stats) {
   ShmCacheWrapper* obj = Nan::ObjectWrap::Unwrap<ShmCacheWrapper>(info.This());
+  v8::Isolate* isolate = info.GetIsolate();
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
   struct shmcache_stats stats;
   shmcache_stats(&obj->context, &stats);
 
@@ -152,30 +153,30 @@ NAN_METHOD(ShmCacheWrapper::Stats) {
   v8::Local<v8::Object> tableObj = Nan::New<v8::Object>();
   v8::Local<v8::Object> lockObj = Nan::New<v8::Object>();
 
-  retObj->Set(Nan::New<v8::String>("memory").ToLocalChecked(), memObj);
-  retObj->Set(Nan::New<v8::String>("hashTable").ToLocalChecked(), tableObj);
-  retObj->Set(Nan::New<v8::String>("lock").ToLocalChecked(), lockObj);
+  retObj->Set(context, Nan::New<v8::String>("memory").ToLocalChecked(), memObj).FromJust();
+  retObj->Set(context, Nan::New<v8::String>("hashTable").ToLocalChecked(), tableObj).FromJust();
+  retObj->Set(context, Nan::New<v8::String>("lock").ToLocalChecked(), lockObj).FromJust();
 
-  memObj->Set(Nan::New<v8::String>("total").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.memory.max));
-  memObj->Set(Nan::New<v8::String>("allocated").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.memory.usage.alloced));
-  memObj->Set(Nan::New<v8::String>("used").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.memory.used));
+  memObj->Set(context, Nan::New<v8::String>("total").ToLocalChecked(),
+          Nan::New<v8::Number>(stats.memory.max)).FromJust();
+  memObj->Set(context, Nan::New<v8::String>("allocated").ToLocalChecked(),
+          Nan::New<v8::Number>(stats.memory.usage.alloced)).FromJust();
+  memObj->Set(context, Nan::New<v8::String>("used").ToLocalChecked(),
+          Nan::New<v8::Number>(stats.memory.used)).FromJust();
 
-  tableObj->Set(Nan::New<v8::String>("maxKeyCount").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.max_key_count));
-  tableObj->Set(Nan::New<v8::String>("currentKeyCount").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.hashtable.count));
+  tableObj->Set(context, Nan::New<v8::String>("maxKeyCount").ToLocalChecked(),
+          Nan::New<v8::Number>(stats.max_key_count)).FromJust();
+  tableObj->Set(context, Nan::New<v8::String>("currentKeyCount").ToLocalChecked(),
+          Nan::New<v8::Number>(stats.hashtable.count)).FromJust();
 
-  lockObj->Set(Nan::New<v8::String>("totalCount").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.shm.lock.total));
-  lockObj->Set(Nan::New<v8::String>("retryCount").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.shm.lock.retry));
-  lockObj->Set(Nan::New<v8::String>("detectDeadLockCount").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.shm.lock.detect_deadlock));
-  lockObj->Set(Nan::New<v8::String>("unlockDeadLockCount").ToLocalChecked(),
-          Nan::New<v8::Number>(stats.shm.lock.unlock_deadlock));
+  lockObj->Set(context, Nan::New<v8::String>("totalCount").ToLocalChecked(),
+          Nan::New<v8::Number>(stats.shm.lock.total)).FromJust();
+  lockObj->Set(context, Nan::New<v8::String>("retryCount").ToLocalChecked(),
+          Nan::New<v8::Number>(stats.shm.lock.retry)).FromJust();
+  lockObj->Set(context, Nan::New<v8::String>("detectDeadLockCount").ToLocalChecked(),
+          Nan::New<v8::Number>(stats.shm.lock.detect_deadlock)).FromJust();
+  lockObj->Set(context, Nan::New<v8::String>("unlockDeadLockCount").ToLocalChecked(),
+          Nan::New<v8::Number>(stats.shm.lock.unlock_deadlock)).FromJust();
 
   info.GetReturnValue().Set(retObj);
 }
