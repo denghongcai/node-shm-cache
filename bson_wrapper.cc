@@ -106,22 +106,22 @@ v8::Local<v8::Value> v8_value_from_bson_iter(bson_iter_t* iter, v8::Local<v8::Va
 
 v8::Local<v8::Value> v8_value_from_bson(bson_t* b) {
     bson_iter_t iter;
-    bson_iter_init(&iter, b);
-    bson_iter_next(&iter);
-    const char* key = bson_iter_key(&iter);
-    const bson_value_t* value = bson_iter_value(&iter);
-    v8::Local<v8::Value> target;
-    if (strncmp(key, SHM_INTERNAL_KEY, SHM_INTERNAL_KEY_LEN) == 0) {
-        if (value->value_type == BSON_TYPE_ARRAY) {
-            target = Nan::New<v8::Array>();
-        } else if (value->value_type == BSON_TYPE_DOCUMENT) {
-            target = Nan::New<v8::Object>();
-        } else {
-            return v8_value_from_bson_value(value);
+    if ( bson_iter_init(&iter, b) && bson_iter_next(&iter)){
+        const char* key = bson_iter_key(&iter);
+        const bson_value_t* value = bson_iter_value(&iter);
+        v8::Local<v8::Value> target;
+        if (strncmp(key, SHM_INTERNAL_KEY, SHM_INTERNAL_KEY_LEN) == 0) {
+            if (value->value_type == BSON_TYPE_ARRAY) {
+                target = Nan::New<v8::Array>();
+            } else if (value->value_type == BSON_TYPE_DOCUMENT) {
+                target = Nan::New<v8::Object>();
+            } else {
+                return v8_value_from_bson_value(value);
+            }
+            bson_iter_t child;
+            bson_iter_recurse(&iter, &child);
+            return v8_value_from_bson_iter(&child, target);
         }
-        bson_iter_t child;
-        bson_iter_recurse(&iter, &child);
-        return v8_value_from_bson_iter(&child, target);
     }
     // TODO
     return Nan::Undefined();
