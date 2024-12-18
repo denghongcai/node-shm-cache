@@ -56,7 +56,22 @@ jobs:
         echo "CXX=g++" >> $GITHUB_ENV
 
     - name: Install dependencies
-      run: npm install
+      run: |
+        npm install --build-from-source
+        npm test
 
-    - name: Build
-      run: npm run build
+    - name: Before Build
+      run: |
+        if [[ $PUBLISH_BINARY == true ]]; then node-pre-gyp package; node-pre-gyp-github publish --release; fi;
+        node-pre-gyp clean
+        node-gyp clean
+    
+    - name: Publish Check
+      run: |
+        INSTALL_RESULT=0
+        if [[ $PUBLISH_BINARY == true ]]; then INSTALL_RESULT=$(npm install --fallback-to-build=false > /dev/null)$? || true; fi;
+        if [[ $INSTALL_RESULT != 0 ]]; then echo "returned $INSTALL_RESULT";false; fi
+        node-pre-gyp clean
+
+    - name: Build Success
+      run: node-pre-gyp info
