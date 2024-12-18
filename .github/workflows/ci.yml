@@ -83,6 +83,3 @@ jobs:
         if [[ $PUBLISH_BINARY == true ]]; then INSTALL_RESULT=$(npm install --fallback-to-build=false > /dev/null)$? || true; fi;
         if [[ $INSTALL_RESULT != 0 ]]; then echo "returned $INSTALL_RESULT";false; fi
         ./node_modules/.bin/node-pre-gyp clean
-
-    - name: Build Success
-      run: ./node_modules/.bin/node-pre-gyp info
