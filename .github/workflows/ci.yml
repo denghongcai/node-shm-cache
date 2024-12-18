@@ -66,12 +66,14 @@ jobs:
         sudo apt-get install -y g++
         echo "CXX=g++" >> $GITHUB_ENV
 
-    - name: Install dependencies
+    - name: Install
       run: |
         npm install --build-from-source
         npm test
 
-    - name: Before Build
+    - name: Publish
+      env:
+        NODE_PRE_GYP_GITHUB_TOKEN: ${{ secrets.NODE_PRE_GYP_GITHUB_TOKEN }}
       run: |
         if [[ $PUBLISH_BINARY == true ]]; then node-pre-gyp package; node-pre-gyp-github publish --release; fi;
         ./node_modules/.bin/node-pre-gyp clean
