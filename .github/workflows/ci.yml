@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  tags:
+    - '*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node-version: [8, 10, 12, 14, 16, 18, 20, 22]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Set macOS system controls
+      if: runner.os == 'macOS'
+      run: |
+        sudo sysctl -w kern.sysv.shmall=65536
+        sudo sysctl -w kern.sysv.shmmax=16777216
+
+    - name: Setup build tools
+      run: |
+        npm install -g node-gyp
+        npm install -g node-pre-gyp-github
+
+    - name: Set publish flag
+      run: |
+        echo "PUBLISH_BINARY=false" >> $GITHUB_ENV
+        if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
+          echo "PUBLISH_BINARY=true" >> $GITHUB_ENV
+        fi
+        if [[ "${{ github.event.head_commit.message }}" == *"[publish binary]"* ]]; then
+          echo "PUBLISH_BINARY=true" >> $GITHUB_ENV
+        fi
+
+    - name: Setup Linux compiler
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++-4.8
+        echo "CXX=g++-4.8" >> $GITHUB_ENV
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build
+      run: npm run build
