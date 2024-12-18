@@ -49,6 +49,6 @@
   },
   "homepage": "https://github.com/denghongcai/node-shm-cache#readme",
   "engines": {
-    "node": ">=8"
+    "node": ">=16"
   }
 }
