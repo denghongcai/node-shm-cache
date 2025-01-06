@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: 
+      - '*'
+    tags:
+      - '*'
+  pull_request:
+    branches: 
+      - '*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node-version: [16, 18, 20, 22]
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.10' 
+
+    - name: Set macOS system controls
+      if: runner.os == 'macOS'
+      run: |
+        sudo sysctl -w kern.sysv.shmall=65536
+        sudo sysctl -w kern.sysv.shmmax=16777216
+
+    - name: Setup build tools
+      run: |
+        npm install -g node-gyp
+        npm install -g node-pre-gyp-github
+
+    - name: Setup macOS build tools
+      if: runner.os == 'macOS'
+      run: |
+        env HOMEBREW_NO_AUTO_UPDATE=1 brew install autoconf automake libtool
+
+    - name: Set publish flag
+      run: |
+        echo "PUBLISH_BINARY=false" >> $GITHUB_ENV
+        if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
+          echo "PUBLISH_BINARY=true" >> $GITHUB_ENV
+        fi
+        if [[ "${{ github.event.head_commit.message }}" == *"[publish binary]"* ]]; then
+          echo "PUBLISH_BINARY=true" >> $GITHUB_ENV
+        fi
+
+    - name: Setup Linux compiler
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++
+        echo "CXX=g++" >> $GITHUB_ENV
+
+    - name: Install
+      run: |
+        npm install --build-from-source
+        npm test
+
+    - name: Publish
+      env:
+        NODE_PRE_GYP_GITHUB_TOKEN: ${{ secrets.NODE_PRE_GYP_GITHUB_TOKEN }}
+      run: |
+        if [[ $PUBLISH_BINARY == true ]]; then node-pre-gyp package; node-pre-gyp-github publish --release; fi;
+        ./node_modules/.bin/node-pre-gyp clean
+        node-gyp clean
+    
+    - name: Publish Check
+      run: |
+        INSTALL_RESULT=0
+        if [[ $PUBLISH_BINARY == true ]]; then INSTALL_RESULT=$(npm install --fallback-to-build=false > /dev/null)$? || true; fi;
+        if [[ $INSTALL_RESULT != 0 ]]; then echo "returned $INSTALL_RESULT";false; fi
+        ./node_modules/.bin/node-pre-gyp clean

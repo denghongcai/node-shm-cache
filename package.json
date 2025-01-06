@@ -6,9 +6,9 @@
     "clean": "node-pre-gyp clean",
     "test": "mocha",
     "install": "node-pre-gyp install --fallback-to-build || (npm run build:fastcommon && npm run build:shmcache && npm run build:libbson && node-pre-gyp install --fallback-to-build)",
-    "build:fastcommon": "cd deps/libfastcommon && MACOSX_DEPLOYMENT_TARGET=10.7 ./make.sh",
-    "build:shmcache": "cd deps/libshmcache/src && MACOSX_DEPLOYMENT_TARGET=10.7 LIBRARY_PATH=../../libfastcommon/src INC_PATH=\" -I../../libfastcommon/src\" make -e",
-    "build:libbson": "cd deps/ && MACOSX_DEPLOYMENT_TARGET=10.7 ./build-libbson.sh",
+    "build:fastcommon": "cd deps/libfastcommon && MACOSX_DEPLOYMENT_TARGET=11.0 ./make.sh",
+    "build:shmcache": "cd deps/libshmcache/src && MACOSX_DEPLOYMENT_TARGET=11.0 LIBRARY_PATH=../../libfastcommon/src INC_PATH=\" -I../../libfastcommon/src\" make -e",
+    "build:libbson": "cd deps/ && MACOSX_DEPLOYMENT_TARGET=11.0 ./build-libbson.sh",
     "trim": "cd deps/ && rm -rf libbson/.git && rm -rf libshmcache/.git && rm -rf libfastcommon/.git && rm libbson/.gitignore && rm libbson/README && cp libbson/README.rst libbson/README"
   },
   "binary": {
@@ -18,14 +18,14 @@
     "remote_path": "{version}"
   },
   "devDependencies": {
+    "@mapbox/node-pre-gyp": "^1.0.11",
     "mocha": "^3.2.0",
+    "node-gyp": "^11.0.0",
     "node-pre-gyp-github": "^1.3.1"
   },
   "dependencies": {
     "bindings": "^1.5.0",
-    "nan": "^2.14.1",
-    "node-gyp": "^3.8.0",
-    "node-pre-gyp": "^0.6.39"
+    "nan": "^2.22.0"
   },
   "gypfile": true,
   "name": "shm-cache",
@@ -49,6 +49,6 @@
   },
   "homepage": "https://github.com/denghongcai/node-shm-cache#readme",
   "engines": {
-    "node": ">=8"
+    "node": ">=16"
   }
 }
