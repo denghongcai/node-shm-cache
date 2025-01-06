@@ -75,7 +75,7 @@ jobs:
       env:
         NODE_PRE_GYP_GITHUB_TOKEN: ${{ secrets.NODE_PRE_GYP_GITHUB_TOKEN }}
       run: |
-        if [[ $PUBLISH_BINARY == true ]]; then node-pre-gyp package; node-pre-gyp-github publish --release; fi;
+        if [[ $PUBLISH_BINARY == true ]]; then ./node_modules/.bin/node-pre-gyp package; node-pre-gyp-github publish --release; fi;
         ./node_modules/.bin/node-pre-gyp clean
         node-gyp clean
     
